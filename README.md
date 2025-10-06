@@ -16,23 +16,15 @@ one specific layer of the backend pipeline.
 
 ---
 
-### Crates (planned layout)
+### Crates (more coming in the future!)
 - **`rask-common`** — Shared types, target definitions, ABI info, error handling, helpers.
 - **`rask-x86_64`** — Instruction encoder for the x86-64 architecture.
-- **`rask-obj`** — Object file writer (ELF / COFF / Mach-O).
-- **`rask-ir`** — A minimal SSA-like intermediate representation.
-- **`rask-backend`** — Codegen layer connecting IR to machine code.
-- **`rask-cli`** — Command-line utilities and demo compiler.
-
-Each crate can be used independently or together, depending on what you’re building.
-For example, `rask-x86_64` alone is already a small standalone assembler library.
 
 ---
 
 ### Design philosophy
 - **Modular:** Every crate stands on its own and exposes a clean public API.
 - **Predictable:** No magic macros or hidden codegen; everything is explicit.
-- **Educational:** Clear comments and small steps. The goal is to understand, not obscure.
 - **Cross-platform:** Support for multiple targets and ABIs (SystemV, Windows x64, etc).
 - **Hackable:** Minimal external dependencies. You can fork and modify easily.
 

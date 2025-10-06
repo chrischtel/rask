@@ -12,6 +12,23 @@ pub enum Abi {
     Windows,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum RegClass {
+    General,
+    Float,
+    Vector,
+    Flags,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct VirtualReg(u32);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct PhysicalReg {
+    pub id: u8,
+    pub class: RegClass,
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum Endianness {
     Little,

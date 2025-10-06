@@ -27,6 +27,23 @@ pub fn is_power_of_two(value: usize) -> bool {
     value != 0 && (value & (value - 1)) == 0
 }
 
+// Error Handling
+#[derive(Debug)]
+pub enum RaskError {
+    InvalidInstruction,
+    UnsupportedAbi,
+    Io(std::io::Error),
+    // maybe we add here an Other(string) variant later
+}
+
+pub type RaskResult<T> = Result<T, RaskError>;
+
+impl From<std::io::Error> for RaskError {
+    fn from(value: std::io::Error) -> Self {
+        RaskError::Io(value)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

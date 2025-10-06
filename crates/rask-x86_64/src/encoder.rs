@@ -109,6 +109,38 @@ impl Encoder {
         self.emit(modrm);
     }
 
+    pub fn add(&mut self, _dst: Reg64, _src: Reg64) {
+        let mut rex: u8 = 0x48; // Base REX prefix with W=1 (01001000b).
+
+        if _src.id() >= 8 {
+            rex |= 0x04;
+        } // Set REX.R if the source register is R8–R15.
+        if _dst.id() >= 8 {
+            rex |= 0x01;
+        } // Set REX.B if the destination register is R8–R15.
+
+        self.emit(rex);
+        self.emit(0x01); // Opcode for ADD r/m64, r64
+        let modrm: u8 = (0b11 << 6) | ((_src.id() & 0x07) << 3) | (_dst.id() & 0x07); // ModR/M byte for register to register
+        self.emit(modrm);
+    }
+
+    pub fn sub(&mut self, _dst: Reg64, _src: Reg64) {
+        let mut rex: u8 = 0x48; // Base REX prefix with W=1 (01001000b).
+
+        if _src.id() >= 8 {
+            rex |= 0x04;
+        } // Set REX.R if the source register is R8–R15.
+        if _dst.id() >= 8 {
+            rex |= 0x01;
+        } // Set REX.B if the destination register is R8–R15.
+
+        self.emit(rex);
+        self.emit(0x29); // Opcode for SUB r/m64, r64
+        let modrm: u8 = (0b11 << 6) | ((_src.id() & 0x07) << 3) | (_dst.id() & 0x07); // ModR/M byte for register to register
+        self.emit(modrm);
+    }
+
     pub fn mov(&mut self, dst: Operand, src: Operand) {
         match (dst, src) {
             (Operand::Reg(d), Operand::Reg(s)) => self.mov_reg_reg(d, s),

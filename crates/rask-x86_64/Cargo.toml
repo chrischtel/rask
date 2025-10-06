@@ -8,4 +8,4 @@ repository = "https://github.com/chrischtel/rask"
 readme = "README.md"
 
 [dependencies]
-rask-common = { path = "../rask-common" }
+rask-common = { version = "0.1.0", path = "../rask-common" }

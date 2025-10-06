@@ -31,7 +31,7 @@ impl Encoder {
 
     /// Appends a single byte to the buffer.
     #[inline]
-    pub fn emit(&mut self, byte: u8) {
+    fn emit(&mut self, byte: u8) {
         self.buffer.push(byte);
     }
 
@@ -49,7 +49,7 @@ impl Encoder {
     ///
     /// ### Encoding form
     ///
-    /// ```
+    /// ```text
     /// REX.W + B8+rd  imm64
     /// ```
     ///
@@ -109,6 +109,33 @@ impl Encoder {
         self.emit(modrm);
     }
 
+    /// Encodes an `ADD r64, r64` instruction.
+    ///
+    /// ### Encoding form
+    /// ```text
+    /// REX.W + 01 /r
+    /// ```
+    /// * **REX prefix** — 1 byte, of the form `0100WRXB`:
+    ///   - **W = 1** → 64-bit operand size
+    ///  - **R = (src_id >> 3)** → extends the low 3-bit reg number of the source register to access R8–R15
+    ///  - **X = 0** → no SIB index extension
+    /// - **B = (dst_id >> 3)** → extends the low 3-bit reg number of the destination register to access R8–R15
+    /// * **Opcode** — `0x01`
+    /// * **ModR/M** — ModR/M byte specifying the registers:
+    ///   - Bits 0-2: r/m (destination register)
+    ///  - Bits 3-5: reg (source register)
+    ///  - Bits 6-7: mod (addressing mode, `11` for register-direct)
+    /// Example encoding:
+    /// | Instruction      | Bytes (hex)                                |
+    /// |------------------|--------------------------------------------|
+    /// | `add rax, rbx`   | 48 01 D8                                   |
+    /// | `add r10, r9`    | 49 01 D1                                   |
+    /// Reference: Intel SDM Vol. 2A, "ADD—Add" (Opcode 01 /r).
+    /// Note: This implementation currently only supports register-to-register addition.
+    /// Memory operands and immediate values are not yet implemented.
+    /// TODO: Extend support for other operand types in the future.
+    /// Panics if either operand is not a register.
+    /// Currently, only `Reg` operands are supported.
     pub fn add(&mut self, _dst: Reg64, _src: Reg64) {
         let mut rex: u8 = 0x48; // Base REX prefix with W=1 (01001000b).
 
@@ -162,7 +189,7 @@ impl Encoder {
     /// Encodes a `RET` (near return) instruction.
     ///
     /// ### Encoding form
-    /// ```
+    /// ```text
     /// C3
     /// ```
     ///

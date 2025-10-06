@@ -1,5 +1,5 @@
 # rask
-    A modular, low-level code generation toolkit for Rust.
+A modular, low-level code generation toolkit for Rust.
 
 ### Status
 This project is in a very early alpha state and is probably gonna stay here a long time.

@@ -5,3 +5,9 @@ pub enum Architecture {
     RiscV64,
     Other,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Abi {
+    SystemV,
+    Windows,
+}

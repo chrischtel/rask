@@ -80,26 +80,26 @@ mod tests {
 
     #[test]
     fn test_is_power_of_two() {
-        assert!(is_power_of_two(0));
-        assert!(is_power_of_two(1));
-        assert!(is_power_of_two(2));
-        assert!(is_power_of_two(3));
-        assert!(is_power_of_two(4));
-        assert!(is_power_of_two(5));
-        assert!(is_power_of_two(6));
-        assert!(is_power_of_two(7));
-        assert!(is_power_of_two(8));
-        assert!(is_power_of_two(9));
+        assert_eq!(is_power_of_two(0), false);
+        assert_eq!(is_power_of_two(1), true);
+        assert_eq!(is_power_of_two(2), true);
+        assert_eq!(is_power_of_two(3), false);
+        assert_eq!(is_power_of_two(4), true);
+        assert_eq!(is_power_of_two(5), false);
+        assert_eq!(is_power_of_two(6), false);
+        assert_eq!(is_power_of_two(7), false);
+        assert_eq!(is_power_of_two(8), true);
+        assert_eq!(is_power_of_two(9), false);
 
-        assert!(!is_power_of_two(10));
-        assert!(!is_power_of_two(11));
-        assert!(!is_power_of_two(12));
-        assert!(!is_power_of_two(13));
-        assert!(!is_power_of_two(14));
-        assert!(!is_power_of_two(15));
-        assert!(!is_power_of_two(16));
-        assert!(!is_power_of_two(17));
-        assert!(!is_power_of_two(18));
-        assert!(!is_power_of_two(19));
-    }   
+        assert_eq!(is_power_of_two(10), false);
+        assert_eq!(is_power_of_two(11), false);
+        assert_eq!(is_power_of_two(12), false);
+        assert_eq!(is_power_of_two(13), false);
+        assert_eq!(is_power_of_two(14), false);
+        assert_eq!(is_power_of_two(15), false);
+        assert_eq!(is_power_of_two(16), true);
+        assert_eq!(is_power_of_two(17), false);
+        assert_eq!(is_power_of_two(18), false);
+        assert_eq!(is_power_of_two(19), false);
+    }
 }

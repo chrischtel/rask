@@ -24,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added high-level `mov` instruction entry point using the new `Operand` system.
   - Introduced the `Operand` enum, allowing pattern matching between registers, immediates, and future memory operands.
   - Added `mov_reg_reg` implementation with proper REX prefix and ModR/M encoding logic.
+  - Added `add r64, r64`, `sub r64, r64`, and `ret` instruction encoders.
+  - Unified the `Encoder` API to expose high-level instruction functions.
+  - Expanded doc comments with Intel SDM references.
 
 ### Changed
 - Restructured into a unified Cargo workspace with modular sub-crates (`rask-common`, `rask-x86_64`).

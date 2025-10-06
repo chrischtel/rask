@@ -11,25 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **rask-common**
-  - Base architecture for `Architecture`, `Abi`, and `Target` structs.
-  - Utility helpers: `align_to()`, `is_power_of_two()`.
-  - Error type `RaskError` and alias `RaskResult`.
-  - Word size constants for major architectures.
-  - `Endianness` enum and placeholder for future target methods.
-  - Unit tests for alignment and power-of-two functions.
+  - Defined base types: `Architecture`, `Abi`, and `Target`.
+  - Added utility helpers: `align_to()` and `is_power_of_two()`.
+  - Introduced `RaskError` type and `RaskResult` alias.
+  - Added word size constants for major architectures.
+  - Added `Endianness` enum and basic target information helpers.
+  - Added unit tests for alignment and power-of-two validation.
+
 - **rask-x86_64**
-  - Initial project setup.
-  - Dependency on `rask-common`.
-  - Added mov_rax_imm64 instruction ecoding
+  - Initial crate setup with dependency on `rask-common`.
+  - Implemented `mov_reg_imm64` instruction encoding.
+  - Added high-level `mov` instruction entry point using the new `Operand` system.
+  - Introduced the `Operand` enum, allowing pattern matching between registers, immediates, and future memory operands.
+  - Added `mov_reg_reg` implementation with proper REX prefix and ModR/M encoding logic.
 
 ### Changed
-- Project restructured into a Cargo workspace with sub-crates.
-- Standardized internal module naming conventions (`rask-common`, `rask-x86_64`).
-
-### Planned
-- Implement instruction encoder in `rask-x86_64`.
-- Introduce `rask-obj` crate for ELF/COFF object generation.
-- Define calling conventions for SystemV and Windows ABI.
+- Restructured into a unified Cargo workspace with modular sub-crates (`rask-common`, `rask-x86_64`).
+- Standardized module naming and internal API consistency.
 
 ---
 

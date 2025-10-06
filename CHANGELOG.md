@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **rask-x86_64**
   - Initial project setup.
   - Dependency on `rask-common`.
+  - Added mov_rax_imm64 instruction ecoding
 
 ### Changed
 - Project restructured into a Cargo workspace with sub-crates.

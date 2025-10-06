@@ -11,3 +11,10 @@ pub enum Abi {
     SystemV,
     Windows,
 }
+
+#[derive(Debug, Clone, Copy)]
+pub struct Target {
+    pub arch: Architecture,
+    pub abi: Abi,
+    pub pointer_width: u8, // in bits
+}

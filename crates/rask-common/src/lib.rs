@@ -48,12 +48,18 @@ impl Target {
             Architecture::X86_64 | Architecture::AArch64 | Architecture::RiscV64 => 64,
             Architecture::Other => 64,
         };
-        Self { arch, abi, pointer_width }
+        Self {
+            arch,
+            abi,
+            pointer_width,
+        }
     }
 
     pub fn endianness(&self) -> Endianness {
         match self.arch {
-            Architecture::X86_64 | Architecture::AArch64 | Architecture::RiscV64 => Endianness::Little,
+            Architecture::X86_64 | Architecture::AArch64 | Architecture::RiscV64 => {
+                Endianness::Little
+            }
             Architecture::Other => Endianness::Little,
         }
     }
@@ -94,7 +100,9 @@ pub enum RaskError {
 pub type RaskResult<T> = Result<T, RaskError>;
 
 impl From<std::io::Error> for RaskError {
-    fn from(value: std::io::Error) -> Self { Self::Io(value) }
+    fn from(value: std::io::Error) -> Self {
+        Self::Io(value)
+    }
 }
 
 impl std::fmt::Display for RaskError {
@@ -119,10 +127,25 @@ mod tests {
 
     #[test]
     fn test_align_to_basic() {
+        // Test that 0 is always aligned
         for alignment in [1, 2, 4, 8, 16] {
             assert_eq!(align_to(0, alignment), 0);
-            assert_eq!(align_to(alignment - 1, alignment), alignment);
         }
+
+        // Test that values align up correctly
+        assert_eq!(align_to(1, 2), 2);
+        assert_eq!(align_to(2, 2), 2);
+        assert_eq!(align_to(3, 2), 4);
+
+        assert_eq!(align_to(1, 4), 4);
+        assert_eq!(align_to(3, 4), 4);
+        assert_eq!(align_to(4, 4), 4);
+        assert_eq!(align_to(5, 4), 8);
+
+        assert_eq!(align_to(1, 8), 8);
+        assert_eq!(align_to(7, 8), 8);
+        assert_eq!(align_to(8, 8), 8);
+        assert_eq!(align_to(9, 8), 16);
     }
 
     #[test]

@@ -4,7 +4,7 @@
 //! directly into a `Vec<u8>`.  It currently supports a minimal subset of
 //! instructions, starting with `mov r64, imm64` and `ret`.
 
-use crate::registers::Reg64;
+use crate::{operand::Operand, registers::Reg64};
 
 /// The main byte emitter for x86-64 machine code.
 ///
@@ -71,7 +71,7 @@ impl Encoder {
     /// | `mov r10, 42`    | 49 BA 2A 00 00 00 00 00 00 00             |
     ///
     /// Reference: Intel SDM Vol. 2A, “MOV—Move” (Opcode B8+rd).
-    pub fn mov_reg_imm64(&mut self, dst: Reg64, value: u64) {
+    fn mov_reg_imm64(&mut self, dst: Reg64, value: u64) {
         // Base REX prefix with W=1 (01001000b).
         let mut rex: u8 = 0x48;
 
@@ -84,6 +84,47 @@ impl Encoder {
         self.emit(rex);
         self.emit(0xB8 + (dst.id() & 0x07));
         self.emit_all(&value.to_le_bytes());
+    }
+
+    /// Encodes a `MOV r64, r64` instruction.
+    ///
+    /// ModR/M Encoding form
+    /// Bits 0-2: r/m (destination register or memory operand)
+    /// Bits 3-5: reg (source register)
+    /// Bits 6-7: mod (addressing mode register-direct or memory)
+    ///
+    fn mov_reg_reg(&mut self, _dst: Reg64, _src: Reg64) {
+        let mut rex: u8 = 0x48; // Base REX prefix with W=1 (01001000b).
+
+        if _src.id() >= 8 {
+            rex |= 0x04;
+        } // Set REX.R if the source register is R8–R15.
+        if _dst.id() >= 8 {
+            rex |= 0x01;
+        } // Set REX.B if the destination register is R8–R15.
+
+        self.emit(rex);
+        self.emit(0x89); // Opcode for MOV r/m64, r64
+        let modrm: u8 = (0b11 << 6) | ((_src.id() & 0x07) << 3) | (_dst.id() & 0x07); // ModR/M byte for register to register
+        self.emit(modrm);
+    }
+
+    pub fn mov(&mut self, dst: Operand, src: Operand) {
+        match (dst, src) {
+            (Operand::Reg(d), Operand::Reg(s)) => self.mov_reg_reg(d, s),
+            (Operand::Reg(d), Operand::Imm(imm)) => self.mov_reg_imm64(d, imm as u64),
+            (Operand::Mem(_), Operand::Reg(_)) => todo!("mov [mem], reg not yet implemented"),
+            (Operand::Reg(_), Operand::Mem(_)) => todo!("mov reg, [mem] not yet implemented"),
+            (Operand::Mem(_), Operand::Mem(_)) => {
+                panic!("MOV from memory to memory is invalid on x86-64");
+            }
+            (Operand::Imm(_), _) => {
+                panic!("Cannot move from an immediate as source");
+            }
+            (Operand::Mem(_), Operand::Imm(_)) => {
+                todo!("mov [mem], imm not yet implemented");
+            }
+        }
     }
 
     /// Encodes a `RET` (near return) instruction.

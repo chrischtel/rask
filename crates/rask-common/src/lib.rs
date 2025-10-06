@@ -27,16 +27,28 @@ pub fn is_power_of_two(value: usize) -> bool {
     value != 0 && (value & (value - 1)) == 0
 }
 
-// Error Handling
 #[derive(Debug)]
 pub enum RaskError {
     InvalidInstruction,
     UnsupportedAbi,
     Io(std::io::Error),
-    // maybe we add here an Other(string) variant later
+    Other(String),
 }
 
 pub type RaskResult<T> = Result<T, RaskError>;
+
+impl std::fmt::Display for RaskError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::InvalidInstruction => write!(f, "invalid instruction"),
+            Self::UnsupportedAbi => write!(f, "unsupported ABI"),
+            Self::Io(e) => write!(f, "I/O error: {e}"),
+            Self::Other(msg) => write!(f, "{msg}"),
+        }
+    }
+}
+
+impl std::error::Error for RaskError {}
 
 impl From<std::io::Error> for RaskError {
     fn from(value: std::io::Error) -> Self {

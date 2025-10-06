@@ -1,0 +1,14 @@
+[package]
+name = "rask-common"
+version = "0.1.0"
+edition = "2024"
+description = "Common utilities and types for the Rask project"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/chrischtel/rask"
+readme = "README.md"
+
+[dependencies]
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["rlib", "cdylib"]

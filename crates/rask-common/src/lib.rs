@@ -44,6 +44,18 @@ impl From<std::io::Error> for RaskError {
     }
 }
 
+pub const WORD_SIZE_X86_64: usize = 8;
+pub const WORD_SIZE_AARCH64: usize = 8;
+
+// TODO: add support for other architectures
+
+// TODO: add from_target() method
+#[derive(Debug, Clone, Copy)]
+pub enum Endianness {
+    Little,
+    Big,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

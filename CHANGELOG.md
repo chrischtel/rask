@@ -31,8 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **rask-common**
 - Bug fixes
 - **rask-x86_64**
-- Encoding corrections
-- Test fixes
+  - Removed unused import for the tests
 
 ### Security
 - Security-related changes

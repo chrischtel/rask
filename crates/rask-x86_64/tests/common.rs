@@ -1,4 +1,4 @@
-use rask_x86_64::encoder::{self, Encoder};
+use rask_x86_64::encoder::Encoder;
 
 /// Helper to format mismatches clearly when comparing byte sequences.
 pub fn assert_bytes(actual: &[u8], expected: &[u8]) {

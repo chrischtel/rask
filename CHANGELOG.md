@@ -12,8 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **rask-common**
 - New feature or functionality
 - **rask-x86_64**
-- New instruction support
-- New examples
+  - Added memory move instructions: `mov reg, [mem]` and `mov [mem], reg` with displacement support
+  - Addes tests for memory adressing features
 
 ### Changed
 - **rask-common**

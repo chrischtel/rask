@@ -109,6 +109,108 @@ impl Encoder {
         self.emit(modrm);
     }
 
+    /// Encodes a `MOV r64, [mem]` instruction (load from memory).
+    ///
+    /// ### Encoding form
+    /// ```text
+    /// REX.W + 8B /r
+    /// ```
+    ///
+    /// * **REX prefix** — 1 byte:
+    ///   - **W = 1** → 64-bit operand size
+    ///   - **R = (dst_id >> 3)** → extends destination register field
+    ///   - **B = (base_id >> 3)** → extends base register field
+    ///
+    /// * **Opcode** — `0x8B` (MOV r64, r/m64)
+    /// * **ModR/M** — depends on addressing mode
+    /// * **Displacement** — 0, 1, or 4 bytes depending on addressing mode
+    fn mov_reg_mem(&mut self, dst: Reg64, src: &crate::operand::MemOperand) {
+        let mut rex: u8 = 0x48; // Base REX.W
+
+        // Set REX.R if destination register needs extension
+        if dst.needs_rex() {
+            rex |= 0x04;
+        }
+
+        // Set REX.B if base register needs extension
+        if src.base.needs_rex() {
+            rex |= 0x01;
+        }
+
+        self.emit(rex);
+        self.emit(0x8B); // MOV r64, r/m64
+
+        // Determine addressing mode based on displacement
+        let (mod_bits, disp_bytes) = if src.disp == 0 && src.base != crate::registers::Reg64::RBP {
+            // [reg] - no displacement (except RBP which requires disp8)
+            (0b00, Vec::new())
+        } else if src.disp >= -128 && src.disp <= 127 {
+            // [reg + disp8] - 8-bit displacement
+            (0b01, vec![src.disp as i8 as u8])
+        } else {
+            // [reg + disp32] - 32-bit displacement
+            (0b10, src.disp.to_le_bytes().to_vec())
+        };
+
+        // Build ModR/M byte: mod(2) + reg(3) + r/m(3)
+        let modrm = (mod_bits << 6) | ((dst.id() & 0x07) << 3) | (src.base.id() & 0x07);
+        self.emit(modrm);
+
+        // Emit displacement bytes
+        self.emit_all(&disp_bytes);
+    }
+
+    /// Encodes a `MOV [mem], r64` instruction (store to memory).
+    ///
+    /// ### Encoding form
+    /// ```text
+    /// REX.W + 89 /r
+    /// ```
+    ///
+    /// * **REX prefix** — 1 byte:
+    ///   - **W = 1** → 64-bit operand size
+    ///   - **R = (src_id >> 3)** → extends source register field
+    ///   - **B = (base_id >> 3)** → extends base register field
+    ///
+    /// * **Opcode** — `0x89` (MOV r/m64, r64)
+    /// * **ModR/M** — depends on addressing mode
+    /// * **Displacement** — 0, 1, or 4 bytes depending on addressing mode
+    fn mov_mem_reg(&mut self, dst: &crate::operand::MemOperand, src: Reg64) {
+        let mut rex: u8 = 0x48; // Base REX.W
+
+        // Set REX.R if source register needs extension
+        if src.needs_rex() {
+            rex |= 0x04;
+        }
+
+        // Set REX.B if base register needs extension
+        if dst.base.needs_rex() {
+            rex |= 0x01;
+        }
+
+        self.emit(rex);
+        self.emit(0x89); // MOV r/m64, r64
+
+        // Determine addressing mode based on displacement
+        let (mod_bits, disp_bytes) = if dst.disp == 0 && dst.base != crate::registers::Reg64::RBP {
+            // [reg] - no displacement (except RBP which requires disp8)
+            (0b00, Vec::new())
+        } else if dst.disp >= -128 && dst.disp <= 127 {
+            // [reg + disp8] - 8-bit displacement
+            (0b01, vec![dst.disp as i8 as u8])
+        } else {
+            // [reg + disp32] - 32-bit displacement
+            (0b10, dst.disp.to_le_bytes().to_vec())
+        };
+
+        // Build ModR/M byte: mod(2) + reg(3) + r/m(3)
+        let modrm = (mod_bits << 6) | ((src.id() & 0x07) << 3) | (dst.base.id() & 0x07);
+        self.emit(modrm);
+
+        // Emit displacement bytes
+        self.emit_all(&disp_bytes);
+    }
+
     /// Encodes an `ADD r64, r64` instruction.
     ///
     /// ### Encoding form
@@ -172,13 +274,13 @@ impl Encoder {
         match (dst, src) {
             (Operand::Reg(d), Operand::Reg(s)) => self.mov_reg_reg(d, s),
             (Operand::Reg(d), Operand::Imm(imm)) => self.mov_reg_imm64(d, imm as u64),
-            (Operand::Mem(_), Operand::Reg(_)) => todo!("mov [mem], reg not yet implemented"),
-            (Operand::Reg(_), Operand::Mem(_)) => todo!("mov reg, [mem] not yet implemented"),
+            (Operand::Mem(ref m), Operand::Reg(r)) => self.mov_mem_reg(m, r),
+            (Operand::Reg(r), Operand::Mem(ref m)) => self.mov_reg_mem(r, m),
             (Operand::Mem(_), Operand::Mem(_)) => {
                 panic!("MOV from memory to memory is invalid on x86-64");
             }
             (Operand::Imm(_), _) => {
-                panic!("Cannot move from an immediate as source");
+                panic!("Cannot move to an immediate value");
             }
             (Operand::Mem(_), Operand::Imm(_)) => {
                 todo!("mov [mem], imm not yet implemented");

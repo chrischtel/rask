@@ -5,9 +5,22 @@ use rask_common::RegClass;
 /// The numeric `id()` corresponds to the ModR/M and REX register encoding IDs.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Reg64 {
-    RAX, RCX, RDX, RBX,
-    RSP, RBP, RSI, RDI,
-    R8, R9, R10, R11, R12, R13, R14, R15,
+    RAX,
+    RCX,
+    RDX,
+    RBX,
+    RSP,
+    RBP,
+    RSI,
+    RDI,
+    R8,
+    R9,
+    R10,
+    R11,
+    R12,
+    R13,
+    R14,
+    R15,
 }
 
 impl Reg64 {
@@ -24,8 +37,8 @@ impl Reg64 {
             RBP => 5,
             RSI => 6,
             RDI => 7,
-            R8  => 8,
-            R9  => 9,
+            R8 => 8,
+            R9 => 9,
             R10 => 10,
             R11 => 11,
             R12 => 12,

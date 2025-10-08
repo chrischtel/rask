@@ -110,24 +110,10 @@ While Rask is experimental, the techniques are useful for:
 
 ## What's next
 
-The immediate goal is expanding instruction support. Jumps and function calls are next, followed by more arithmetic operations.
+Next up: expanding instruction support — jumps, calls, and more arithmetic.
+I’m also thinking about experimenting with other architectures like ARM64 once the core is solid.
 
 Longer term, I'm interested in higher-level code generation patterns and potentially other architectures (ARM64).
-
-## Try it
-
-The code is on GitHub at https://github.com/chrischtel/rask
-
-Installation:
-```toml
-[dependencies]
-rask-x86_64 = "0.1.0"
-```
-
-Examples:
-```bash
-cargo run --example basic_encoding
-```
 
 Feedback welcome, especially from people working on JIT compilers or low-level tooling.
 

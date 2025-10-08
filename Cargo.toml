@@ -1,4 +1,6 @@
 [workspace]
 resolver = "2"
+package.license = "MIT OR Apache-2.0"
+
 
 members = ["crates/rask-common", "crates/rask-x86_64"]

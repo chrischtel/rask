@@ -41,7 +41,7 @@ fn main() {
 
     println!("Machine code: {:02x?}", enc.bytes());
 }
-````
+```
 
 Output:
 
@@ -71,9 +71,4 @@ It should always stay **approachable**, **hackable**, and **fun** — a playgrou
 
 MIT
 
-```
-
----
-
-Would you like me to add a short “Contributing” section next (still in that same calm, friendly tone — explaining that this is experimental but welcomes PRs and discussions)?
 ```

@@ -1,72 +1,166 @@
-# rask
-A modular, low-level code generation toolkit for Rust.
+# Rask - x86_64 Instruction Encoder & Code Generation Toolkit
 
-### Status
-This project is in a very early alpha state and is probably gonna stay here a long time.
+**An experimental x86_64 instruction encoding library for Rust. Early development - expect breaking changes.**
 
-### What it is
-Rask consists of multiple crates that together form a lightweight, highly modular
-backend toolkit for building compilers, JITs, or experimental languages in Rust.  
-Think of it as a small and understandable alternative to LLVM or Cranelift —
-something you can actually read, hack on, and extend.
+Rask is a learning-focused x86_64 instruction encoder that lets you generate machine code programmatically. If you want to experiment with low-level code generation, learn x86_64 encoding, or prototype JIT ideas - Rask gives you a clean foundation to build on.
 
-The goal is not to compete in performance or maturity, but to build a clean and
-educational foundation for real code generation. Each module of Rask focuses on
-one specific layer of the backend pipeline.
+⚠️ **Early Development Warning**: Rask is in very early stages. The API will change, many instructions are missing, and it's not ready for production use. Perfect for learning and experimentation.
 
----
+## Why Rask?
 
-### Crates (more coming in the future!)
-- **`rask-common`** — Shared types, target definitions, ABI info, error handling, helpers.
-- **`rask-x86_64`** — Instruction encoder for the x86-64 architecture.
+**Educational First** - Every instruction is documented with Intel SDM references. You'll actually understand what's happening.
 
----
+**Lightweight & Hackable** - When LLVM is overkill and you want to understand the basics, Rask is small enough to read and modify.
 
-### Design philosophy
-- **Modular:** Every crate stands on its own and exposes a clean public API.
-- **Predictable:** No magic macros or hidden codegen; everything is explicit.
-- **Cross-platform:** Support for multiple targets and ABIs (SystemV, Windows x64, etc).
-- **Hackable:** Minimal external dependencies. You can fork and modify easily.
+**Type-Safe Foundation** - Catch encoding errors at compile time instead of debugging invalid machine code.
 
----
+**Correct Encoding** - What's implemented generates byte-perfect machine code with comprehensive tests.
 
-### Example (Work in Progress)
+## Quick Start
+
+Add Rask to your project:
+
+```toml
+[dependencies]
+rask-x86_64 = "0.1.0"
+rask-common = "0.1.0"
+```
+
+Generate your first machine code:
+
 ```rust
-use rask_x86_64::{Encoder, Reg64::*};
+use rask_x86_64::{encoder::Encoder, registers::Reg64::*, operand::Operand};
 
-fn main() {
-    let mut enc = Encoder::new();
-    enc.mov_reg_imm64(RAX, 1337);
-    enc.ret();
+let mut encoder = Encoder::new();
 
-    println!("Machine code: {:02x?}", enc.bytes());
-}
+// mov rax, 1337
+encoder.mov(Operand::Reg(RAX), Operand::Imm(1337));
+
+// add rax, rbx  
+encoder.add(RAX, RBX);
+
+// ret
+encoder.ret();
+
+let machine_code = encoder.bytes();
+// Output: [0x48, 0xb8, 0x39, 0x05, ...]
 ```
 
-Output:
+## Supported Instructions
 
+**Memory Operations**
+- `mov reg, [mem]` - Load from memory
+- `mov [mem], reg` - Store to memory  
+- `mov reg, reg` - Register to register
+- `mov reg, immediate` - Load immediate values
+
+**Arithmetic**
+- `add reg, reg` - 64-bit addition
+- `sub reg, reg` - 64-bit subtraction
+
+**Control Flow**
+- `ret` - Function return
+
+**Coming Soon:** Jump instructions, more arithmetic, stack operations, function calls
+
+## Advanced Features
+
+**Memory Addressing with Displacement**
+```rust
+use rask_x86_64::operand::MemOperand;
+
+// mov rax, [rbx + 8]
+let mem = MemOperand { base: RBX, disp: 8 };
+encoder.mov(Operand::Reg(RAX), Operand::Mem(mem));
 ```
-48 b8 39 05 00 00 00 00 00 00 c3
+
+**Extended Register Support (R8-R15)**
+```rust
+// Automatic REX prefix handling
+encoder.mov(Operand::Reg(R10), Operand::Imm(42));
+encoder.add(R8, R9);
 ```
 
-That’s a valid function which, when executed, sets `RAX = 1337` and returns.
+**Cross-Platform Target Support**
+```rust
+use rask_common::{Target, Architecture, Abi};
 
----
+let target = Target::from_arch(Architecture::X86_64, Abi::SystemV);
+// Use target info for platform-specific code generation
+```
 
-### Long-term vision
+## Examples
 
-Rask aims to become a complete, open, and comprehensible backend foundation for Rust developers
-who want to experiment with:
+Run the included examples to see Rask in action:
 
-* custom programming languages and DSLs,
-* virtual machines or JIT compilers,
-* low-level tooling (assemblers, disassemblers, linkers),
-* or simply learning how modern compilers emit machine code.
+```bash
+# Basic instruction encoding
+cargo run --example basic_encoding
 
-It should always stay **approachable**, **hackable**, and **fun** — a playground for backend developers.
+# REX prefix demonstration  
+cargo run --example rex_prefixes
 
----
+# Arithmetic operations
+cargo run --example arithmetic
+```
 
-### License
+## Use Cases
 
-MIT
+**JIT Compilers** - Generate machine code at runtime for dynamic languages or DSLs
+
+**Assembly Tools** - Build custom assemblers or code analysis tools
+
+**Compiler Backends** - Use as a backend for your programming language
+
+**Educational Projects** - Learn x86_64 instruction encoding with clear, documented examples
+
+**Performance Critical Code** - Generate optimized machine code for specific algorithms
+
+## Architecture
+
+Rask is built as a modular workspace:
+
+- **`rask-common`** - Shared types, target definitions, utilities
+- **`rask-x86_64`** - x86_64 instruction encoding
+- **`rask-aarch64`** - ARM64 support (planned)
+
+#### _*more crates are coming in the future*_
+
+## Documentation
+
+Each instruction encoder includes comprehensive documentation with:
+- Intel SDM references
+- Encoding format details
+- Example byte sequences
+- ModR/M and REX prefix explanations
+
+## Testing
+
+Rask includes extensive test coverage with byte-level verification:
+
+```bash
+cargo test
+```
+
+Every instruction is tested against known-good byte sequences to ensure correctness.
+
+## Contributing
+
+Rask is designed to be hackable and extensible. Adding new instructions is straightforward:
+
+1. Implement the encoding logic
+2. Add comprehensive tests  
+3. Document with Intel SDM references
+4. Submit a pull request
+
+See our examples for instruction implementation patterns.
+
+## Roadmap
+
+**Current:** x86_64 core instructions, memory operations
+**Next:** Jump instructions, function calls, stack operations  
+**Future:** ARM64 support, high-level code generation, optimization passes
+
+## License
+
+Licensed under either of Apache License, Version 2.0 or MIT license at your option.

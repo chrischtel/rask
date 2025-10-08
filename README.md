@@ -4,7 +4,8 @@
 
 Rask is a learning-focused x86_64 instruction encoder that lets you generate machine code programmatically. If you want to experiment with low-level code generation, learn x86_64 encoding, or prototype JIT ideas - Rask gives you a clean foundation to build on.
 
-⚠️ **Early Development Warning**: Rask is in very early stages. The API will change, many instructions are missing, and it's not ready for production use. Perfect for learning and experimentation.
+⚠️ **Early Development Warning**: Rask is still very early — the API will change, many instructions are missing, and it’s not ready for production.  
+But it’s already a great playground if you want to learn how x86_64 encoding actually works.
 
 ## Why Rask?
 

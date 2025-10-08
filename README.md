@@ -70,5 +70,3 @@ It should always stay **approachable**, **hackable**, and **fun** — a playgrou
 ### License
 
 MIT
-
-```
